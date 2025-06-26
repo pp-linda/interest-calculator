@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Interest Calculator</title>
+  <title>Interest Calculators</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
-    .container { max-width: 400px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .container { max-width: 600px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     h2 { text-align: center; margin-bottom: 1rem; }
     label { display: block; margin-top: 1rem; }
     input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
     button { width: 100%; padding: 0.75rem; margin-top: 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
     button:hover { background: #0056b3; }
-    #result { margin-top: 1rem; font-weight: bold; text-align: center; }
+    #result, #compoundResult, #loanResult { margin-top: 1rem; font-weight: bold; text-align: center; white-space: pre-line; }
+    hr { margin: 2rem 0; }
   </style>
 </head>
 <body>
@@ -23,6 +24,25 @@
     <label>Time (years): <input type="number" id="time"></label>
     <button onclick="calculateInterest()">Calculate</button>
     <p id="result"></p>
+
+    <hr>
+
+    <h2>Compound Interest Calculator</h2>
+    <label>Principal ($): <input type="number" id="cPrincipal"></label>
+    <label>Rate (% per year): <input type="number" id="cRate"></label>
+    <label>Time (years): <input type="number" id="cTime"></label>
+    <label>Compounded times per year: <input type="number" id="cN" value="1"></label>
+    <button onclick="calculateCompoundInterest()">Calculate</button>
+    <p id="compoundResult"></p>
+
+    <hr>
+
+    <h2>Loan / Mortgage Calculator</h2>
+    <label>Loan Amount ($): <input type="number" id="loanAmount"></label>
+    <label>Annual Interest Rate (%): <input type="number" id="loanRate"></label>
+    <label>Loan Term (years): <input type="number" id="loanTerm"></label>
+    <button onclick="calculateLoan()">Calculate</button>
+    <p id="loanResult"></p>
   </div>
 
   <script>
@@ -37,6 +57,39 @@
       const interest = (p * r * t) / 100;
       const total = p + interest;
       document.getElementById('result').innerText = `Interest: $${interest.toFixed(2)}\nTotal Amount: $${total.toFixed(2)}`;
+    }
+
+    function calculateCompoundInterest() {
+      const p = parseFloat(document.getElementById('cPrincipal').value);
+      const r = parseFloat(document.getElementById('cRate').value) / 100;
+      const t = parseFloat(document.getElementById('cTime').value);
+      const n = parseFloat(document.getElementById('cN').value);
+      if (isNaN(p) || isNaN(r) || isNaN(t) || isNaN(n)) {
+        document.getElementById('compoundResult').innerText = 'Please enter valid numbers in all fields.';
+        return;
+      }
+      const amount = p * Math.pow(1 + r / n, n * t);
+      const interest = amount - p;
+      document.getElementById('compoundResult').innerText = `Compound Interest: $${interest.toFixed(2)}\nTotal Amount: $${amount.toFixed(2)}`;
+    }
+
+    function calculateLoan() {
+      const principal = parseFloat(document.getElementById('loanAmount').value);
+      const annualRate = parseFloat(document.getElementById('loanRate').value) / 100;
+      const years = parseFloat(document.getElementById('loanTerm').value);
+      const months = years * 12;
+      const monthlyRate = annualRate / 12;
+
+      if (isNaN(principal) || isNaN(annualRate) || isNaN(years)) {
+        document.getElementById('loanResult').innerText = 'Please enter valid numbers in all fields.';
+        return;
+      }
+
+      const monthlyPayment = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+      const totalPayment = monthlyPayment * months;
+      const totalInterest = totalPayment - principal;
+
+      document.getElementById('loanResult').innerText = `Monthly Payment: $${monthlyPayment.toFixed(2)}\nTotal Payment: $${totalPayment.toFixed(2)}\nTotal Interest: $${totalInterest.toFixed(2)}`;
     }
   </script>
 </body>
